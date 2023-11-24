@@ -1,0 +1,42 @@
+//This is your Prisma schema file,
+//learn more about it in the docs: https://pris.ly/d/prisma-schema
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output   = "diagramasDB/ERD.svg"
+// }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL")
+  directUrl         = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id String @id @default(uuid())
+
+  email    String @unique
+  password String
+
+  name         String
+  confirmEmail Boolean @default(false)
+  tenant       Tenant  @relation(fields: [tenantUuid], references: [uuid])
+  tenantUuid   String  @unique
+}
+
+model Tenant {
+  uuid String @id @default(uuid())
+  user User?
+
+  categoria Categoria[]
+}
+
+model Categoria {
+  uuid       String  @id @default(uuid())
+  categoria  String
+  tenant     Tenant? @relation(fields: [tenantUuid], references: [uuid])
+  tenantUuid String
+}
